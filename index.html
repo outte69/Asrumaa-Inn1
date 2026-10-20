@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Asrumaa Inn – Guest House, S. Meedhoo</title>
+<style>
+:root{color-scheme:light;--bg:#fff;--card:#fff;--ink:#1d2b2a;--mut:#667;--pri:#0f766e;--pri2:#e6f4f2;--line:#e5e7eb;--bad:#b42318;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--card);border-bottom:1px solid var(--line)}
+.logo{height:48px}.logo img{height:100%;display:block}
+header h1{font-size:0;margin:0;flex:1}
+button{background:var(--pri);color:#fff;border:0;border-radius:8px;padding:9px 14px;font:inherit;cursor:pointer;margin:2px 0}
+button.alt{background:var(--pri2);color:var(--pri)}button.bad{background:var(--bad)}
+main{max-width:980px;margin:0 auto;padding:16px}
+.hero{padding:20px 16px;text-align:center}.hero h2{font-size:28px;margin:8px 0 6px}.hero p{color:var(--mut);margin:0}
+.herologo{height:130px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.pic{display:grid;grid-template-columns:2fr 1fr;gap:4px;margin-bottom:8px}
+.pic img,.sh img,.gi{width:100%;height:130px;object-fit:cover;border-radius:8px;display:block}.gi{margin-bottom:8px}
+.sh{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:10px 0}.sh figure{margin:0}.sh figcaption,.note{font-size:13px;color:var(--mut)}
+.about{text-align:center;max-width:720px;margin:0 auto 18px}.about h3{margin:0 0 8px;font-size:22px;color:var(--pri)}.about p{margin:0 0 10px}
+ul.am{columns:2;padding-left:18px;margin:8px 0}@media(max-width:520px){ul.am{columns:1}}
+.pill{font-size:12px;padding:2px 8px;border-radius:99px;background:var(--pri2);color:var(--pri)}.pill.b{background:#fde8e6;color:var(--bad)}
+input,select,textarea{width:100%;padding:9px;border:1px solid #d1d5db;border-radius:8px;background:#fff;color:var(--ink);font:inherit;margin:4px 0 10px}
+label{font-size:13px;color:var(--mut)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}.tabs button{background:var(--pri2);color:var(--pri)}.tabs button.on{background:var(--pri);color:#fff}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:8px;border-bottom:1px solid var(--line);white-space:nowrap}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px}.stats b{font-size:22px;display:block}
+#chatbtn{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));border-radius:99px;padding:12px 18px;z-index:5}
+#chat{position:fixed;right:14px;bottom:calc(70px + env(safe-area-inset-bottom,0px));width:min(340px,calc(100% - 28px));background:var(--card);border:1px solid var(--line);border-radius:12px;z-index:5;display:none;flex-direction:column;max-height:60vh}
+#chat.open{display:flex}#log{padding:10px;overflow:auto;flex:1;display:flex;flex-direction:column;gap:6px}
+.m{padding:8px 10px;border-radius:10px;max-width:85%;font-size:14px}.m.u{background:var(--pri);color:#fff;align-self:flex-end}.m.a{background:var(--pri2);align-self:flex-start}
+#chat form{display:flex;gap:6px;padding:8px;border-top:1px solid var(--line)}#chat input{margin:0}
+.inv{background:#fff;color:#111;padding:22px;border-radius:8px;border:1px solid #ccc}.inv th,.inv td{border-color:#ddd}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;padding:14px;z-index:9;overflow:auto}.modal.open{display:flex}.modal>div{max-width:620px;width:100%}
+@media print{body *{visibility:hidden}.modal,.modal *{visibility:visible}.modal{position:absolute;background:none;display:block}.np{display:none!important}}
+</style></head><body>
+<header><div class="logo"><img src="images/logo.jpg" alt="Asrumaa Inn"></div><h1>Asrumaa Inn</h1><span id="hb"></span></header>
+<main id="app"><p class="note">Loading…</p></main>
+<button id="chatbtn">Chat</button>
+<div id="chat"><div id="log"></div><form id="cf"><input id="ci" placeholder="Ask about prices, rooms…" autocomplete="off"><button>Send</button></form></div>
+<div class="modal" id="modal"><div id="mbody"></div></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<script>
+var C=window.CONFIG,sb=supabase.createClient(C.SUPABASE_URL,C.SUPABASE_ANON_KEY);
+var ADDR="Asrumaa Inn, Asrumaa Vaadhee, Bahaudheen Magu, 19010, S. Meedhoo",TEL="+9609112787",MAIL="asrumaainn@gmail.com";
+var DR=["images/room1.jpg","images/room2.jpg","images/room3.jpg"],DB=["images/bath1.jpg","images/bath2.jpg","images/bath3.jpg"];
+var SH=[["images/living.jpg","Living room"],["images/kitchen.jpg","Dining, kitchen and laundry"],["images/entrance.jpg","Entrance"]];
+var rooms=[],guide=[],rate=450,guest=null,admin=false,tab="sum",login=false,recov=false,err="",D={b:[],e:[],g:[],r:[]};
+try{guest=localStorage.getItem("guest")}catch(e){}
+var $=function(i){return document.getElementById(i)},E=function(t){return String(t==null?"":t).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})};
+var money=function(n){return "MVR "+Number(n).toLocaleString()},today=function(){return new Date().toISOString().slice(0,10)};
+function free(){return rooms.filter(function(r){return!r.booked})}
+async function load(){
+ var r=await sb.from("rooms").select("*").order("id");
+ if(r.error){err="Cannot reach the database. Check config.js and the README.";render();return}
+ err="";rooms=r.data;
+ var g=await sb.from("guide").select("*").order("sort").order("id");guide=g.data||[];
+ var s=await sb.from("settings").select("*");(s.data||[]).forEach(function(x){if(x.key=="rate")rate=+x.value});
+ if(admin){var b=await sb.from("bookings").select("*").order("id",{ascending:false}),e=await sb.from("expenses").select("*").order("id",{ascending:false}),q=await sb.from("guests").select("*").order("id",{ascending:false}).limit(20);D.b=b.data||[];D.e=e.data||[];D.g=q.data||[];var rq=await sb.from("booking_requests").select("*").order("id",{ascending:false});D.r=rq.data||[]}
+ render()}
+sb.auth.onAuthStateChange(function(ev,ses){if(ev=="PASSWORD_RECOVERY")recov=true;admin=!!ses;setTimeout(load,0)});
+async function refresh(){var a=document.activeElement;if(a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName))return;var r=await sb.from("rooms").select("*").order("id");if(r.error||JSON.stringify(r.data)==JSON.stringify(rooms))return;rooms=r.data;render()}
+try{sb.channel("rooms-live").on("postgres_changes",{event:"*",schema:"public",table:"rooms"},refresh).subscribe()}catch(e){}
+setInterval(refresh,30000);
+function render(){
+ $("hb").innerHTML=admin?'<button class="alt" onclick="sb.auth.signOut()">Log out</button>':login?'<button class="alt" onclick="login=false;render()">Back to site</button>':'<button class="alt" onclick="login=true;render()">Admin</button>';
+ var a=$("app");
+ if(err){a.innerHTML='<div class="card">'+err+'</div>';return}
+ if(recov){a.innerHTML=passForm("Create a new password");return}
+ a.innerHTML=admin?adminView():(login?loginView():homeView())}
+function loginView(){return'<div class="card" style="max-width:360px;margin:auto"><b>Admin login</b><label>Username</label><input id="lu" autocapitalize="off"><label>Password</label><input id="lp" type="password"><button onclick="doLogin()">Log in</button> <button class="alt" onclick="forgot()">Forgot password</button><p class="note" id="lm"></p></div>'}
+async function doLogin(){var em=C.ADMIN_LOGIN[$("lu").value.trim().toLowerCase()];if(!em){$("lm").textContent="Unknown username";return}
+ var r=await sb.auth.signInWithPassword({email:em,password:$("lp").value});if(r.error)$("lm").textContent=r.error.message;else login=false}
+async function forgot(){var em=C.ADMIN_LOGIN[$("lu").value.trim().toLowerCase()];if(!em){$("lm").textContent="Enter your username first";return}
+ var r=await sb.auth.resetPasswordForEmail(em,{redirectTo:location.href.split("#")[0].split("?")[0]});$("lm").textContent=r.error?r.error.message:"A password reset link was sent to the admin email."}
+function passForm(t){return'<div class="card" style="max-width:360px;margin:auto"><b>'+t+'</b><label>New password (8 or more characters)</label><input id="np" type="password"><button onclick="setPass()">Save password</button><p class="note" id="pm"></p></div>'}
+async function setPass(){var p=$("np").value;if(p.length<8){$("pm").textContent="Use at least 8 characters";return}var r=await sb.auth.updateUser({password:p});if(r.error)$("pm").textContent=r.error.message;else{recov=false;$("pm").textContent="Password changed.";if(admin)setTimeout(render,1200);else render()}}
+function homeView(){
+ var h='<div class="hero"><img class="herologo" src="images/logo.jpg" alt="Asrumaa Inn logo"><h2>Welcome to Asrumaa Inn</h2><p>A friendly guest house in S. Meedhoo</p><p class="note">'+E(ADDR)+'<br>'+TEL+' · '+MAIL+'</p></div><div class="card about"><h3>Your home away from home, on island time</h3><p>Welcome to Asrumaa Inn, a calm guest house in S. Meedhoo, where you do not check into a hotel, you settle into a home.</p><p>Wake up in your own air-conditioned room with a private bathroom, a wardrobe and a desk for your laptop. Then step into a shared living room and dining area, make use of the kitchen, wash your clothes in our laundry and stay connected with free WiFi.</p><p>Travelling alone, as a couple or with friends, take a room, make yourself at home and spend your days the way island life invites you to: slowly. Leave with the feeling that you belong a little to the island.</p></div>';
+ if(!guest)h+='<div class="card" style="max-width:380px;margin:auto"><b>Guests: see our room rates</b><p class="note">Enter your details to view prices.</p><label>Name</label><input id="gn"><label>Phone or email</label><input id="gc"><button onclick="enter()">View rooms</button></div>';
+ h+='<h3>Our rooms</h3><p><span class="pill'+(free().length?'':' b')+'">'+(free().length?free().length+' of '+rooms.length+' rooms available now':'All rooms are currently booked')+'</span> <span class="note">Updates automatically</span></p>';{h+=(guest?'<p>Hello '+E(guest)+'. Rate: <b>'+money(rate)+'</b> per room per night, with free WiFi.</p>':'<p class="note">Free WiFi included. Enter your details above to see the rates.</p>')+'<div class="grid">';
+  rooms.forEach(function(r,i){h+='<div class="card" style="'+(r.booked?'opacity:.75':'')+'"><div class="pic"><img src="'+E(r.photo||DR[i]||DR[0])+'" alt="'+E(r.name)+'"><img src="'+E(r.bath_photo||DB[i]||DB[0])+'" alt="Private bathroom"></div><b>'+E(r.name)+'</b> <span class="pill '+(r.booked?'b':'')+'">'+(r.booked?'Booked':'Available')+'</span>'+(guest?'<div>'+money(rate)+' / night</div>':'')+(r.booked?'<div class="note">Currently occupied</div>':'<button onclick="reqForm('+r.id+')">Book this room</button>')+'</div>'});
+  h+='</div><p class="note">Each room has a private bathroom, AC, a wardrobe, a working desk and a ceiling fan.</p><h3>Shared with all guests</h3><ul class="am"><li>Living room</li><li>Dining area and kitchen</li><li>Laundry with washing machine</li><li>Free WiFi</li></ul><div class="sh">'+SH.map(function(s){return'<figure><img src="'+s[0]+'" alt="'+s[1]+'"><figcaption>'+s[1]+'</figcaption></figure>'}).join("")+'</div><p class="note">To book, call '+TEL+', email '+MAIL+' or ask the chat.</p>'}
+ return h+'<h3>Arrival guide and nearby places</h3>'+(guide.length?'<div class="grid">'+guide.map(function(g){return'<div class="card">'+(g.image?'<img class="gi" src="'+E(g.image)+'" alt="">':'')+'<b>'+E(g.title)+'</b><div class="note" style="white-space:pre-wrap">'+E(g.description)+'</div></div>'}).join("")+'</div>':'<p class="note">Our arrival guide is coming soon. Call '+TEL+' for directions.</p>')}
+async function enter(){var n=$("gn").value.trim(),c=$("gc").value.trim();if(!n||!c){alert("Please fill both fields");return}guest=n;try{localStorage.setItem("guest",n)}catch(e){}sb.from("guests").insert({name:n,contact:c}).then(function(){});render()}
+function tot(){var s=0,e=0;D.b.forEach(function(b){s+=+b.total});D.e.forEach(function(x){e+=+x.amount});return{s:s,e:e,r:s-e}}
+function adminView(){
+ var pn=D.r.filter(function(x){return x.status=="pending"}).length,T=[["sum","Summary"],["req","Requests"+(pn?" ("+pn+")":"")],["book","Bookings"],["rooms","Rooms"],["photos","Photos"],["guide","Arrival guide"],["exp","Expenses"],["set","Settings"]];
+ var h='<div class="tabs">'+T.map(function(t){return'<button class="'+(tab==t[0]?'on':'')+'" onclick="tab=\''+t[0]+'\';render()">'+t[1]+'</button>'}).join("")+'</div>',t=tot();
+ if(tab=="sum")h+='<div class="stats"><div class="card">Total sales<b>'+money(t.s)+'</b></div><div class="card">Expenses<b>'+money(t.e)+'</b></div><div class="card">Remaining<b style="color:'+(t.r<0?'var(--bad)':'var(--pri)')+'">'+money(t.r)+'</b></div><div class="card">New requests<b style="color:'+(pn?'var(--bad)':'inherit')+'">'+pn+'</b></div><div class="card">Rooms free<b>'+free().length+' / '+rooms.length+'</b></div></div><p class="note">Remaining = sales minus expenses.</p><h3>Recent guest sign-ins</h3><div class="tw"><table><tr><th>Name</th><th>Contact</th><th>When</th></tr>'+D.g.map(function(g){return'<tr><td>'+E(g.name)+'</td><td>'+E(g.contact)+'</td><td>'+E(String(g.created_at).slice(0,10))+'</td></tr>'}).join("")+'</table></div>';
+ if(tab=="req")h+=(D.r.length?'':'<p class="note">No booking requests yet.</p>')+'<div class="tw"><table><tr><th>Received</th><th>Name</th><th>Phone</th><th>Email</th><th>Room</th><th>Check-in</th><th>Nights</th><th>Message</th><th>Status</th><th></th></tr>'+D.r.map(function(x){return'<tr><td>'+E(String(x.created_at).slice(0,10))+'</td><td>'+E(x.name)+'</td><td><a href="tel:'+E(x.phone)+'">'+E(x.phone)+'</a></td><td>'+E(x.email)+'</td><td>'+E(rn(x.room_id))+'</td><td>'+x.check_in+'</td><td>'+x.nights+'</td><td style="white-space:normal;min-width:160px">'+E(x.message)+'</td><td>'+E(x.status)+'</td><td>'+(x.status=="pending"?'<button onclick="confirmReq('+x.id+')">Confirm</button> <button class="alt" onclick="setReq('+x.id+',\'declined\')">Decline</button> ':'')+'<button class="bad" onclick="del(\'booking_requests\','+x.id+')">Delete</button></td></tr>'}).join("")+'</table></div>';
+ if(tab=="book"){h+='<div class="card"><b>New booking and invoice</b><label>Guest name</label><input id="bn"><label>Room</label><select id="br">'+rooms.map(function(r){return'<option value="'+r.id+'">'+E(r.name)+'</option>'}).join("")+'</select><label>Check-in date</label><input id="bd" type="date"><label>Nights</label><input id="bq" type="number" min="1" value="1"><button onclick="addBook()">Save and create invoice</button></div><br><div class="tw"><table><tr><th>Invoice</th><th>Guest</th><th>Room</th><th>Date</th><th>Nights</th><th>Total</th><th></th></tr>'+D.b.map(function(b){return'<tr><td>'+no(b)+'</td><td>'+E(b.guest)+'</td><td>'+E(rn(b.room_id))+'</td><td>'+b.check_in+'</td><td>'+b.nights+'</td><td>'+money(b.total)+'</td><td><button class="alt" onclick="inv('+b.id+')">Invoice</button> <button class="bad" onclick="del(\'bookings\','+b.id+')">Delete</button></td></tr>'}).join("")+'</table></div>'}
+ if(tab=="rooms")h+='<div class="grid">'+rooms.map(function(r){return'<div class="card"><b>'+E(r.name)+'</b> <span class="pill '+(r.booked?'b':'')+'">'+(r.booked?'Booked':'Available')+'</span><br><br><button class="alt" onclick="tog('+r.id+','+!r.booked+')">Mark as '+(r.booked?'available':'booked')+'</button></div>'}).join("")+'</div>';
+ if(tab=="photos")h+='<p class="note">Choose a new picture to replace the current one. It is resized automatically.</p><div class="grid">'+rooms.map(function(r,i){return'<div class="card"><b>'+E(r.name)+'</b><div class="pic"><img src="'+E(r.photo||DR[i]||DR[0])+'" alt=""><img src="'+E(r.bath_photo||DB[i]||DB[0])+'" alt=""></div><label>Bedroom photo</label><input type="file" accept="image/*" onchange="photo('+r.id+',\'photo\',this)"><label>Bathroom photo</label><input type="file" accept="image/*" onchange="photo('+r.id+',\'bath_photo\',this)"></div>'}).join("")+'</div>';
+ if(tab=="guide")h+='<div class="card"><b>Add a place or arrival tip</b><label>Title</label><input id="gt"><label>Description (how to get there, distance, tips)</label><textarea id="gd" rows="3"></textarea><label>Photo (optional)</label><input id="gf" type="file" accept="image/*"><button onclick="addGuide()">Add to guide</button></div><br><div class="grid">'+guide.map(function(g){return'<div class="card">'+(g.image?'<img class="gi" src="'+E(g.image)+'" alt="">':'')+'<b>'+E(g.title)+'</b><div class="note" style="white-space:pre-wrap">'+E(g.description)+'</div><button class="bad" onclick="del(\'guide\','+g.id+')">Delete</button></div>'}).join("")+'</div>';
+ if(tab=="exp")h+='<div class="card"><b>Add expense</b><label>Description</label><input id="ed"><label>Amount (MVR)</label><input id="ea" type="number" min="0"><button onclick="addExp()">Add</button></div><br><div class="tw"><table><tr><th>Date</th><th>Description</th><th>Amount</th><th></th></tr>'+D.e.map(function(x){return'<tr><td>'+x.d+'</td><td>'+E(x.description)+'</td><td>'+money(x.amount)+'</td><td><button class="bad" onclick="del(\'expenses\','+x.id+')">Delete</button></td></tr>'}).join("")+'</table></div>';
+ if(tab=="set")h+='<div class="card" style="max-width:360px"><b>Room rate per night (MVR)</b><input id="rt" type="number" min="0" value="'+rate+'"><button onclick="saveRate()">Save rate</button></div><br>'+passForm("Change admin password");
+ return h}
+function reqForm(id){var r=rooms.find(function(x){return x.id==id});$("mbody").innerHTML='<div class="card"><b>Book '+E(r.name)+'</b><label>Your name</label><input id="qn" value="'+E(guest||"")+'"><label>Phone number (WhatsApp if possible)</label><input id="qp" type="tel"><label>Email (optional)</label><input id="qe" type="email"><label>Check-in date</label><input id="qd" type="date" min="'+today()+'"><label>Number of nights</label><input id="qq" type="number" min="1" value="1"><label>Message (number of guests, arrival time, requests)</label><textarea id="qm" rows="2"></textarea><button onclick="sendReq('+id+')">Send booking request</button> <button class="alt" onclick="$(\'modal\').classList.remove(\'open\')">Cancel</button><p class="note" id="qs"></p></div>';$("modal").classList.add("open")}
+async function sendReq(id){var n=$("qn").value.trim(),p=$("qp").value.trim(),q=+$("qq").value,d=$("qd").value;if(!n||!p||!d||q<1){$("qs").textContent="Please fill your name, phone, check-in date and nights.";return}
+ var r=await sb.from("booking_requests").insert({room_id:id,name:n,phone:p,email:$("qe").value.trim(),check_in:d,nights:q,message:$("qm").value.trim()});
+ if(r.error){$("qs").textContent="Sorry, the request could not be sent. Please call "+TEL+".";return}
+ $("mbody").innerHTML='<div class="card"><b>Thank you, '+E(n)+'!</b><p>Your request for '+E(rn(id))+' has been received. We will contact you on '+E(p)+' to confirm.</p><button onclick="$(\'modal\').classList.remove(\'open\')">Close</button></div>'}
+async function confirmReq(id){var x=D.r.find(function(y){return y.id==id});if(!x)return;
+ var r=await sb.from("bookings").insert({guest:x.name,room_id:x.room_id,check_in:x.check_in,nights:x.nights,total:x.nights*rate}).select().single();if(r.error){alert(r.error.message);return}
+ await sb.from("rooms").update({booked:true}).eq("id",x.room_id);await sb.from("booking_requests").update({status:"confirmed"}).eq("id",id);await load();inv(r.data.id)}
+async function setReq(id,s){await sb.from("booking_requests").update({status:s}).eq("id",id);await load()}
+function no(b){return"INV-"+String(b.id).padStart(4,"0")}
+function rn(id){var r=rooms.find(function(x){return x.id==id});return r?r.name:"Room"}
+async function del(t,id){if(!confirm("Delete this entry?"))return;var r=await sb.from(t).delete().eq("id",id);if(r.error)alert(r.error.message);await load()}
+async function tog(id,v){await sb.from("rooms").update({booked:v}).eq("id",id);await load()}
+async function addBook(){var n=$("bn").value.trim(),q=+$("bq").value,id=+$("br").value;if(!n||q<1){alert("Enter guest name and nights");return}
+ var r=await sb.from("bookings").insert({guest:n,room_id:id,check_in:$("bd").value||today(),nights:q,total:q*rate}).select().single();if(r.error){alert(r.error.message);return}
+ await sb.from("rooms").update({booked:true}).eq("id",id);await load();inv(r.data.id)}
+async function addExp(){var t=$("ed").value.trim(),a=+$("ea").value;if(!t||!(a>0)){alert("Enter description and amount");return}var r=await sb.from("expenses").insert({description:t,amount:a,d:today()});if(r.error)alert(r.error.message);await load()}
+async function saveRate(){var v=+$("rt").value;if(!(v>0)){alert("Enter a valid rate");return}var r=await sb.from("settings").upsert({key:"rate",value:String(v)});if(r.error)alert(r.error.message);await load()}
+function shrink(f){return new Promise(function(ok,no){var i=new Image();i.onload=function(){var s=Math.min(1,1000/Math.max(i.width,i.height)),c=document.createElement("canvas");c.width=i.width*s;c.height=i.height*s;c.getContext("2d").drawImage(i,0,0,c.width,c.height);c.toBlob(ok,"image/jpeg",.8)};i.onerror=no;i.src=URL.createObjectURL(f)})}
+async function up(f,n){var b=await shrink(f),p=n+"-"+Date.now()+".jpg",r=await sb.storage.from("photos").upload(p,b,{contentType:"image/jpeg"});if(r.error)throw r.error;return sb.storage.from("photos").getPublicUrl(p).data.publicUrl}
+async function photo(id,col,inp){var f=inp.files[0];if(!f)return;try{var o={};o[col]=await up(f,"rooms/room"+id+"-"+col);var r=await sb.from("rooms").update(o).eq("id",id);if(r.error)throw r.error;await load()}catch(e){alert("Upload failed: "+(e.message||e))}}
+async function addGuide(){var t=$("gt").value.trim();if(!t){alert("Enter a title");return}var im="",f=$("gf").files[0];try{if(f)im=await up(f,"guide/place")}catch(e){alert("Upload failed: "+(e.message||e));return}
+ var r=await sb.from("guide").insert({title:t,description:$("gd").value,image:im,sort:guide.length});if(r.error)alert(r.error.message);await load()}
+function inv(id){var b=D.b.find(function(x){return x.id==id});if(!b)return;$("mbody").innerHTML='<div class="inv"><div style="display:flex;gap:12px;align-items:center"><img src="images/logo.jpg" alt="Logo" style="height:70px"><div><b style="font-size:20px">Asrumaa Inn</b><br><small>'+E(ADDR)+'<br>Contact: '+TEL+' · '+MAIL+'</small></div></div><hr><b>INVOICE '+no(b)+'</b><br>Date: '+b.check_in+'<br>Billed to: '+E(b.guest)+'<table style="margin-top:10px"><tr><th>Description</th><th>Rate</th><th>Nights</th><th>Amount</th></tr><tr><td>'+E(rn(b.room_id))+' accommodation</td><td>'+money(b.total/b.nights)+'</td><td>'+b.nights+'</td><td>'+money(b.total)+'</td></tr></table><p style="text-align:right"><b>Total: '+money(b.total)+'</b></p><p><small>Thank you for staying with us.</small></p></div><p class="np"><button onclick="window.print()">Print / Save PDF</button> <button class="alt" onclick="$(\'modal\').classList.remove(\'open\')">Close</button></p>';$("modal").classList.add("open")}
+function say(t,c){var d=document.createElement("div");d.className="m "+c;d.textContent=t;$("log").appendChild(d);$("log").scrollTop=1e9}
+function bot(q){q=q.toLowerCase();var f=free();
+ if(/wifi|wi-fi|internet|laundry|washing|kitchen|facilit|amenit|toilet|bath|living|dining|include/.test(q))return"Each room has a private bathroom. All guests share the living room, dining area and kitchen, and can use the laundry and washing machine. WiFi is free.";
+ if(/about|describe|tell me|why|what is/.test(q))return"Asrumaa Inn is a calm guest house in S. Meedhoo, your home away from home: private rooms with their own bathroom, plus a shared living room, dining area, kitchen and laundry, with free WiFi.";
+ if(/price|rate|cost|how much|mvr|night/.test(q))return"Our rate is "+money(rate)+" per room per night.";
+ if(/avail|free|vacan|book|room/.test(q))return f.length?f.length+" room(s) available now: "+f.map(function(r){return r.name}).join(", ")+". Press Book this room on the page, or call "+TEL+".":"Sorry, all rooms are booked right now. Please call "+TEL+" to check future dates.";
+ if(/where|address|location|find|arriv|nearby|visit|attract/.test(q))return ADDR+". See the Arrival guide section on this page for nearby places.";
+ if(/phone|call|contact|email|mail/.test(q))return"Phone: "+TEL+", email: "+MAIL+".";
+ return"I can help with prices, room availability, facilities, address and contact details. What would you like to know?"}
+$("chatbtn").onclick=function(){$("chat").classList.toggle("open");if(!$("log").children.length)say("Hello! Ask me about prices or room availability.","a")};
+$("cf").onsubmit=function(e){e.preventDefault();var v=$("ci").value.trim();if(!v)return;say(v,"u");$("ci").value="";setTimeout(function(){say(bot(v),"a")},300)};
+</script></body></html>
